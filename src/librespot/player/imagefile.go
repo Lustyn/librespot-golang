@@ -55,10 +55,6 @@ func (i *ImageFile) Read(buf []byte) (int, error) {
 	length := min(i.Size() - i.cursor, len(buf))
 	totalWritten := 0
 
-	if length > len(buf) {
-		fmt.Printf("FEWHFUWEHAFAWEUFH")
-	}
-
 	if length > 0 {
 		//fmt.Printf("length: %d, buf len: %d", i.cursor+length, len(buf))
 		writtenLen := copy(buf, i.data[i.cursor:i.cursor+length])
