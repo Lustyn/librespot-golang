@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Spotify"
+	"github.com/justync7/librespot-golang/src/Spotify"
 	"bufio"
 	"flag"
 	"fmt"
@@ -9,8 +9,8 @@ import (
 	"github.com/xlab/vorbis-go/decoder"
 	"io/ioutil"
 	"librespot"
-	"librespot/core"
-	"librespot/utils"
+	"github.com/justync7/librespot-golang/src/librespot/core"
+	"github.com/justync7/librespot-golang/src/librespot/utils"
 	"log"
 	"os"
 	"strings"

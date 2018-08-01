@@ -1,17 +1,17 @@
 package core
 
 import (
-	"Spotify"
+	"github.com/justync7/librespot-golang/src/Spotify"
 	"bytes"
 	"fmt"
 	"github.com/golang/protobuf/proto"
 	"io"
-	"librespot/connection"
-	"librespot/crypto"
-	"librespot/discovery"
-	"librespot/mercury"
-	"librespot/player"
-	"librespot/utils"
+	"github.com/justync7/librespot-golang/src/librespot/connection"
+	"github.com/justync7/librespot-golang/src/librespot/crypto"
+	"github.com/justync7/librespot-golang/src/librespot/discovery"
+	"github.com/justync7/librespot-golang/src/librespot/mercury"
+	"github.com/justync7/librespot-golang/src/librespot/player"
+	"github.com/justync7/librespot-golang/src/librespot/utils"
 	"log"
 	"net"
 )

@@ -1,12 +1,12 @@
 package player
 
 import (
-	"Spotify"
+	"github.com/justync7/librespot-golang/src/Spotify"
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"librespot/connection"
-	"librespot/mercury"
+	"github.com/justync7/librespot-golang/src/librespot/connection"
+	"github.com/justync7/librespot-golang/src/librespot/mercury"
 	"log"
 	"sync"
 )
@@ -32,6 +32,14 @@ func CreatePlayer(conn connection.PacketStream, client *mercury.Client) *Player 
 		chanLock: sync.Mutex{},
 		nextChan: 0,
 	}
+}
+
+func (p *Player) LoadImage(file *Spotify.Image) (*ImageFile) {
+	imageFile := newImageFile(file, p)
+
+	imageFile.loadData()
+
+	return imageFile
 }
 
 func (p *Player) LoadTrack(file *Spotify.AudioFile, trackId []byte) (*AudioFile, error) {
@@ -106,7 +114,7 @@ func (p *Player) HandleCmd(cmd byte, data []byte) {
 		dataReader := bytes.NewReader(data)
 		binary.Read(dataReader, binary.BigEndian, &channel)
 
-		// fmt.Printf("[player] Data on channel %d: %d bytes\n", channel, len(data[2:]))
+		//fmt.Printf("[player] Data on channel %d: %d bytes\n", channel, len(data[2:]))
 
 		if val, ok := p.channels[channel]; ok {
 			val.handlePacket(data[2:])

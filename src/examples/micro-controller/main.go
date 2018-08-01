@@ -5,7 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"librespot"
-	"librespot/core"
+	"github.com/justync7/librespot-golang/src/librespot/core"
 	"librespot/spirc"
 	"os"
 	"strconv"

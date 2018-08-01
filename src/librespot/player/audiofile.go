@@ -1,14 +1,14 @@
 package player
 
 import (
-	"Spotify"
+	"github.com/justync7/librespot-golang/src/Spotify"
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/binary"
 	"fmt"
 	"io"
-	"librespot/connection"
+	"github.com/justync7/librespot-golang/src/librespot/connection"
 	"math"
 	"sync"
 )

@@ -1,11 +1,11 @@
 package spirc
 
 import (
-	"Spotify"
+	"github.com/justync7/librespot-golang/src/Spotify"
 	"bytes"
 	"github.com/golang/protobuf/proto"
-	"librespot/connection"
-	"librespot/mercury"
+	"github.com/justync7/librespot-golang/src/librespot/connection"
+	"github.com/justync7/librespot-golang/src/librespot/mercury"
 	"testing"
 )
 

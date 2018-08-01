@@ -1,11 +1,11 @@
 package mercury
 
 import (
-	"Spotify"
+	"github.com/justync7/librespot-golang/src/Spotify"
 	"encoding/binary"
 	"github.com/golang/protobuf/proto"
-	"librespot/connection"
-	"librespot/core"
+	"github.com/justync7/librespot-golang/src/librespot/connection"
+	"github.com/justync7/librespot-golang/src/librespot/core"
 	"librespot/spirc"
 	"testing"
 )
