@@ -42,7 +42,7 @@ func (i *ImageFile) Size() int {
 // zero bytes when we are waiting for audio data from the Spotify servers, so make sure to wait for the io.EOF error
 // before stopping playback.
 func (i *ImageFile) Read(buf []byte) (int, error) {
-	if i.Size() == 0 {
+	if i.Size() == 0 || buf == nil || i.data == nil {
 		return 0, nil
 	}
 
@@ -50,14 +50,16 @@ func (i *ImageFile) Read(buf []byte) (int, error) {
 	if i.cursor >= i.Size() && i.eof {
 		err = io.EOF
 		return 0, err
+	} else if i.cursor >= i.Size() {
+		return 0, nil
 	}
-
+	
 	length := min(i.Size() - i.cursor, len(buf))
 	totalWritten := 0
 
 	if length > 0 {
-		//fmt.Printf("length: %d, buf len: %d", i.cursor+length, len(buf))
-		writtenLen := copy(buf, i.data[i.cursor:i.cursor+length])
+		data := i.data[i.cursor:i.cursor+length]
+		writtenLen := copy(buf, data)
 		totalWritten += writtenLen
 		i.cursor += writtenLen
 	}
