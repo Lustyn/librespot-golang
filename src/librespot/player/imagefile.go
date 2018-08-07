@@ -46,25 +46,20 @@ func (i *ImageFile) Read(buf []byte) (int, error) {
 		return 0, nil
 	}
 
-	var err error
 	if i.cursor >= i.Size() && i.eof {
-		err = io.EOF
-		return 0, err
+		return 0, io.EOF
 	} else if i.cursor >= i.Size() {
 		return 0, nil
 	}
 	
-	length := min(i.Size() - i.cursor, len(buf))
 	totalWritten := 0
+	
+	writtenLen := copy(buf, i.data[i.cursor:])
+	
+	totalWritten += writtenLen
+	i.cursor += writtenLen
 
-	if length > 0 {
-		data := i.data[i.cursor:i.cursor+length]
-		writtenLen := copy(buf, data)
-		totalWritten += writtenLen
-		i.cursor += writtenLen
-	}
-
-	return totalWritten, err
+	return totalWritten, nil
 }
 
 func buildCoverArtRequest(channel uint16, fileId []byte) []byte {
