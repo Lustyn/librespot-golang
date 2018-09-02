@@ -103,7 +103,7 @@ func (i *ImageFile) load() error {
 			return io.EOF
 		} else {
 			//i.eof = true
-			fmt.Printf("If this freezes something is wrong...\n", chunkLen)
+			//fmt.Printf("If this freezes something is wrong...\n", chunkLen)
 			//break
 		}
 	}
