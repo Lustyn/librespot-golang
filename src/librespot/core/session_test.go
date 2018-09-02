@@ -1,14 +1,14 @@
 package core
 
 import (
-	"github.com/justync7/librespot-golang/src/Spotify"
+	"github.com/lustyn/librespot-golang/src/Spotify"
 	"bytes"
 	"encoding/binary"
 	"github.com/golang/protobuf/proto"
 	"io"
-	"github.com/justync7/librespot-golang/src/librespot/connection"
-	"github.com/justync7/librespot-golang/src/librespot/crypto"
-	"github.com/justync7/librespot-golang/src/librespot/mercury"
+	"github.com/lustyn/librespot-golang/src/librespot/connection"
+	"github.com/lustyn/librespot-golang/src/librespot/crypto"
+	"github.com/lustyn/librespot-golang/src/librespot/mercury"
 	"librespot/spirc"
 	"math/big"
 	"testing"

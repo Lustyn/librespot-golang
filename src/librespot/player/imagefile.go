@@ -1,10 +1,10 @@
 package player
 
 import (
-	"github.com/justync7/librespot-golang/src/Spotify"
+	"github.com/lustyn/librespot-golang/src/Spotify"
 	"bytes"
 	"encoding/binary"
-	"github.com/justync7/librespot-golang/src/librespot/connection"
+	"github.com/lustyn/librespot-golang/src/librespot/connection"
 	"io"
 	"fmt"
 )
@@ -38,6 +38,10 @@ func (i *ImageFile) Size() int {
 	return len(i.data)
 }
 
+func (i *ImageFile) IsEOF() bool {
+	return i.eof
+}
+
 // Read is an implementation of the io.Reader interface. Note that due to the nature of the streaming, we may return
 // zero bytes when we are waiting for audio data from the Spotify servers, so make sure to wait for the io.EOF error
 // before stopping playback.
@@ -48,9 +52,9 @@ func (i *ImageFile) Read(buf []byte) (int, error) {
 
 	if i.cursor >= i.Size() && i.eof {
 		return 0, io.EOF
-	} else if i.cursor >= i.Size() {
+	}/* else if i.cursor >= i.Size() {
 		return 0, nil
-	}
+	}*/
 	
 	totalWritten := 0
 	
@@ -79,6 +83,7 @@ func (i *ImageFile) load() error {
 	channel := i.player.AllocateChannel()
 	channel.onData = i.onChannelData
 	channel.onHeader = i.onChannelHeader
+	channel.onRelease = i.onRelease
 
 	err := i.player.stream.SendPacket(connection.PacketImage, buildCoverArtRequest(channel.num, i.fileId))
 
@@ -94,9 +99,12 @@ func (i *ImageFile) load() error {
 			i.data = append(i.data, chunk...)
 
 			// fmt.Printf("Read %d/%d of chunk %d\n", sz, expSize, i)
+		} else if i.eof {
+			return io.EOF
 		} else {
-			i.eof = true
-			break
+			//i.eof = true
+			fmt.Printf("If this freezes something is wrong...\n", chunkLen)
+			//break
 		}
 	}
 
@@ -123,4 +131,8 @@ func (i *ImageFile) onChannelData(channel *Channel, data []byte) uint16 {
 		return 0
 	}
 
+}
+
+func (i *ImageFile) onRelease(channel *Channel) {
+	i.eof = true
 }

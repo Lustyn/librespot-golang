@@ -1,11 +1,11 @@
 package mercury
 
 import (
-	"github.com/justync7/librespot-golang/src/Spotify"
+	"github.com/lustyn/librespot-golang/src/Spotify"
 	"encoding/json"
 	"fmt"
 	"github.com/golang/protobuf/proto"
-	"github.com/justync7/librespot-golang/src/librespot/metadata"
+	"github.com/lustyn/librespot-golang/src/librespot/metadata"
 	"net/url"
 )
 

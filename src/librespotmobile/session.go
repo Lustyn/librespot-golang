@@ -1,6 +1,6 @@
 package librespotmobile
 
-import "github.com/justync7/librespot-golang/src/librespot/core"
+import "github.com/lustyn/librespot-golang/src/librespot/core"
 
 // MobileSession exposes a simplified subset of the core.Session struct that is compatible with the subset
 // of types accepted by gomobile. Most calls are proxied to the underlying core.Session pointer, which we
