@@ -17,7 +17,8 @@ type Player struct {
 	seq      uint32
 	audioKey []byte
 
-	chanLock sync.Mutex
+	seqLock  sync.RWMutex
+	chanLock sync.RWMutex
 	channels map[uint16]*Channel
 	seqChans map[uint32]chan []byte
 	nextChan uint16
@@ -29,7 +30,8 @@ func CreatePlayer(conn connection.PacketStream, client *mercury.Client) *Player 
 		mercury:  client,
 		channels: map[uint16]*Channel{},
 		seqChans: map[uint32]chan []byte{},
-		chanLock: sync.Mutex{},
+		chanLock: sync.RWMutex{},
+		seqLock:  sync.RWMutex{},
 		nextChan: 0,
 	}
 }
@@ -63,7 +65,9 @@ func (p *Player) LoadTrackWithIdAndFormat(fileId []byte, format Spotify.AudioFil
 
 func (p *Player) loadTrackKey(trackId []byte, fileId []byte) ([]byte, error) {
 	seqInt, seq := p.mercury.NextSeqWithInt()
+	p.seqLock.Lock()
 	p.seqChans[seqInt] = make(chan []byte)
+	p.seqLock.Unlock()
 
 	req := buildKeyRequest(seq, trackId, fileId)
 	err := p.stream.SendPacket(connection.PacketRequestKey, req)
@@ -72,8 +76,14 @@ func (p *Player) loadTrackKey(trackId []byte, fileId []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	key := <-p.seqChans[seqInt]
+	p.seqLock.RLock()
+	c := p.seqChans[seqInt]
+	p.seqLock.RUnlock()
+	key := <-c
+
+	p.seqLock.Lock()
 	delete(p.seqChans, seqInt)
+	p.seqLock.Unlock()
 
 	return key, nil
 }
@@ -97,7 +107,9 @@ func (p *Player) HandleCmd(cmd byte, data []byte) {
 		var seqNum uint32
 		binary.Read(dataReader, binary.BigEndian, &seqNum)
 
+		p.seqLock.RLock()
 		if channel, ok := p.seqChans[seqNum]; ok {
+			p.seqLock.RUnlock()
 			channel <- data[4:20]
 		} else {
 			fmt.Printf("[player] Unknown channel for audio key seqNum %d\n", seqNum)
@@ -116,7 +128,9 @@ func (p *Player) HandleCmd(cmd byte, data []byte) {
 
 		//fmt.Printf("[player] Data on channel %d: %d bytes\n", channel, len(data[2:]))
 
+		p.chanLock.RLock()
 		if val, ok := p.channels[channel]; ok {
+			p.chanLock.RUnlock()
 			val.handlePacket(data[2:])
 		} else {
 			fmt.Printf("Unknown channel!\n")

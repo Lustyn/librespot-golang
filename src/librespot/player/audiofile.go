@@ -40,6 +40,7 @@ type AudioFile struct {
 	cursor         int
 	chunks         map[int]bool
 	chunksLoading  bool
+	gotSize        bool
 }
 
 func newAudioFile(file *Spotify.AudioFile, player *Player) *AudioFile {
@@ -57,6 +58,7 @@ func newAudioFileWithIdAndFormat(fileId []byte, format Spotify.AudioFile_Format,
 		chunks:        map[int]bool{},
 		chunkLock:     sync.RWMutex{},
 		chunksLoading: false,
+		gotSize:       false,
 	}
 }
 
@@ -77,7 +79,7 @@ func (a *AudioFile) Read(buf []byte) (int, error) {
 	// Offset the data start by the header, if needed
 	if a.cursor == 0 {
 		a.cursor += a.headerOffset()
-	} else if uint32(a.cursor) >= a.size {
+	} else if uint32(a.cursor) >= a.size && a.gotSize {
 		// We're at the end
 		return 0, io.EOF
 	}
@@ -91,7 +93,7 @@ func (a *AudioFile) Read(buf []byte) (int, error) {
 	hasChunks := true
 
 	for i := startChunk; i <= endChunk; i++ {
-		if i >= a.totalChunks() {
+		if i >= a.totalChunks() && a.gotSize {
 			// We've reached the last chunk, so we can signal EOF
 			eof = true
 			break
@@ -303,6 +305,7 @@ func (a *AudioFile) onChannelHeader(channel *Channel, id byte, data *bytes.Reade
 
 		if a.size != size {
 			a.size = size
+			a.gotSize = true
 			if a.data == nil {
 				a.data = make([]byte, size)
 			}
