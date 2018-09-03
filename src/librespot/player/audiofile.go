@@ -356,6 +356,6 @@ func (a *AudioFile) onChannelRelease(channel *Channel) {
 
 		chunkOffsetStart := uint32(a.chunkIndex * kChunkSize)
 		chunkOffsetEnd := uint32((a.chunkIndex + 1) * kChunkSize)
-		err := a.player.stream.SendPacket(connection.PacketStreamChunk, buildAudioChunkRequest(channel.num, a.fileId, chunkOffsetStart, chunkOffsetEnd))
+		a.player.stream.SendPacket(connection.PacketStreamChunk, buildAudioChunkRequest(channel.num, a.fileId, chunkOffsetStart, chunkOffsetEnd))
 	}
 }
