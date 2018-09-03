@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/lustyn/librespot-golang/src/Spotify"
 	"github.com/lustyn/librespot-golang/src/librespot/connection"
+	"go.uber.org/ratelimit"
 	"io"
 	"math"
 	"sync"
@@ -223,7 +224,10 @@ func (a *AudioFile) requestChunk(chunkIndex int) {
 	a.chunkLock.Unlock()
 }
 
+var chunklimit = ratelimit.New(10)
+
 func (a *AudioFile) loadChunk(chunkIndex int) error {
+	chunklimit.Take()
 	chunkData := make([]byte, kChunkByteSize)
 
 	channel := a.player.AllocateChannel()
