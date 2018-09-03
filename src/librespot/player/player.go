@@ -20,6 +20,7 @@ type Player struct {
 
 	seqLock  sync.RWMutex
 	chanLock sync.RWMutex
+	keyLock  sync.Mutex
 	channels map[uint16]*Channel
 	seqChans map[uint32]chan []byte
 	nextChan uint16
@@ -33,6 +34,7 @@ func CreatePlayer(conn connection.PacketStream, client *mercury.Client) *Player 
 		seqChans: map[uint32]chan []byte{},
 		chanLock: sync.RWMutex{},
 		seqLock:  sync.RWMutex{},
+		keyLock:  sync.Mutex{},
 		nextChan: 0,
 	}
 }
@@ -65,6 +67,7 @@ func (p *Player) LoadTrackWithIdAndFormat(fileId []byte, format Spotify.AudioFil
 }
 
 func (p *Player) loadTrackKey(trackId []byte, fileId []byte) ([]byte, error) {
+	p.keyLock.Lock()
 	seqInt, seq := p.mercury.NextSeqWithInt()
 	p.seqLock.Lock()
 	p.seqChans[seqInt] = make(chan []byte)
@@ -85,6 +88,7 @@ func (p *Player) loadTrackKey(trackId []byte, fileId []byte) ([]byte, error) {
 	p.seqLock.Lock()
 	delete(p.seqChans, seqInt)
 	p.seqLock.Unlock()
+	p.keyLock.Unlock()
 
 	return key, nil
 }
