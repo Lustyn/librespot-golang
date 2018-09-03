@@ -347,14 +347,6 @@ func (a *AudioFile) onChannelData(channel *Channel, data []byte) uint16 {
 
 }
 func (a *AudioFile) onChannelAbort(channel *Channel) {
-	if a.chunksLoading {
-		channel := a.player.AllocateChannel()
-		channel.onHeader = a.onChannelHeader
-		channel.onData = a.onChannelData
-		channel.onAbort = a.onChannelAbort
-
-		chunkOffsetStart := uint32(a.chunkIndex * kChunkSize)
-		chunkOffsetEnd := uint32((a.chunkIndex + 1) * kChunkSize)
-		a.player.stream.SendPacket(connection.PacketStreamChunk, buildAudioChunkRequest(channel.num, a.fileId, chunkOffsetStart, chunkOffsetEnd))
-	}
+	// aborted
+	channel.onRelease(channel)
 }
