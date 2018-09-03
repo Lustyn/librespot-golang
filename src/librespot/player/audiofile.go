@@ -224,7 +224,7 @@ func (a *AudioFile) loadChunk(chunkIndex int) error {
 	channel := a.player.AllocateChannel()
 	channel.onHeader = a.onChannelHeader
 	channel.onData = a.onChannelData
-	channel.onRelease = a.onChannelRelease
+	channel.onAbort = a.onChannelAbort
 
 	chunkOffsetStart := uint32(chunkIndex * kChunkSize)
 	chunkOffsetEnd := uint32((chunkIndex + 1) * kChunkSize)
@@ -251,7 +251,7 @@ func (a *AudioFile) loadChunk(chunkIndex int) error {
 	}
 
 	// fmt.Printf("[AudioFile] Got encrypted chunk %d, len=%d...\n", i, len(wholeData))
-	if len(chunkData) > 0 {
+	if chunkSz > 0 {
 		a.putEncryptedChunk(chunkIndex, chunkData[0:chunkSz])
 	}
 
@@ -346,13 +346,12 @@ func (a *AudioFile) onChannelData(channel *Channel, data []byte) uint16 {
 	}
 
 }
-
-func (a *AudioFile) onChannelRelease(channel *Channel) {
+func (a *AudioFile) onChannelAbort(channel *Channel) {
 	if a.chunksLoading {
 		channel := a.player.AllocateChannel()
 		channel.onHeader = a.onChannelHeader
 		channel.onData = a.onChannelData
-		channel.onRelease = a.onChannelRelease
+		channel.onAbort = a.onChannelAbort
 
 		chunkOffsetStart := uint32(a.chunkIndex * kChunkSize)
 		chunkOffsetEnd := uint32((a.chunkIndex + 1) * kChunkSize)

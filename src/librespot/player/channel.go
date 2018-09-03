@@ -8,6 +8,7 @@ import (
 type headerFunc func(channel *Channel, id byte, data *bytes.Reader) uint16
 type dataFunc func(channel *Channel, data []byte) uint16
 type releaseFunc func(channel *Channel)
+type abortFunc func(channel *Channel)
 
 type Channel struct {
 	num       uint16
@@ -15,6 +16,7 @@ type Channel struct {
 	onHeader  headerFunc
 	onData    dataFunc
 	onRelease releaseFunc
+	onAbort   abortFunc
 }
 
 func NewChannel(num uint16, release releaseFunc) *Channel {

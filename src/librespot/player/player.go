@@ -146,7 +146,9 @@ func (p *Player) HandleCmd(cmd byte, data []byte) {
 		p.chanLock.RLock()
 		if val, ok := p.channels[channel]; ok {
 			p.chanLock.RUnlock()
-			val.onRelease(val)
+			if val.onAbort != nil {
+				val.onAbort(val)
+			}
 		} else {
 			fmt.Printf("Unknown channel!\n")
 		}
