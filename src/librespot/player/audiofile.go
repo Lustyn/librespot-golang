@@ -40,6 +40,7 @@ type AudioFile struct {
 	cursor         int
 	chunks         map[int]bool
 	chunksLoading  bool
+	chunkIndex     int
 	gotSize        bool
 }
 
@@ -58,6 +59,7 @@ func newAudioFileWithIdAndFormat(fileId []byte, format Spotify.AudioFile_Format,
 		chunks:        map[int]bool{},
 		chunkLock:     sync.RWMutex{},
 		chunksLoading: false,
+		chunkIndex:    0,
 		gotSize:       false,
 	}
 }
@@ -222,6 +224,7 @@ func (a *AudioFile) loadChunk(chunkIndex int) error {
 	channel := a.player.AllocateChannel()
 	channel.onHeader = a.onChannelHeader
 	channel.onData = a.onChannelData
+	channel.onRelease = a.onChannelRelease
 
 	chunkOffsetStart := uint32(chunkIndex * kChunkSize)
 	chunkOffsetEnd := uint32((chunkIndex + 1) * kChunkSize)
@@ -248,8 +251,9 @@ func (a *AudioFile) loadChunk(chunkIndex int) error {
 	}
 
 	// fmt.Printf("[AudioFile] Got encrypted chunk %d, len=%d...\n", i, len(wholeData))
-
-	a.putEncryptedChunk(chunkIndex, chunkData[0:chunkSz])
+	if len(chunkData) > 0 {
+		a.putEncryptedChunk(chunkIndex, chunkData[0:chunkSz])
+	}
 
 	return nil
 
@@ -266,6 +270,7 @@ func (a *AudioFile) loadNextChunk() {
 
 	a.chunksLoading = true
 	chunkIndex := a.chunkLoadOrder[0]
+	a.chunkIndex = chunkIndex
 	a.chunkLoadOrder = a.chunkLoadOrder[1:]
 
 	a.chunkLock.Unlock()
@@ -340,4 +345,17 @@ func (a *AudioFile) onChannelData(channel *Channel, data []byte) uint16 {
 		return 0
 	}
 
+}
+
+func (a *AudioFile) onChannelRelease(channel *Channel) {
+	if a.chunksLoading {
+		channel := a.player.AllocateChannel()
+		channel.onHeader = a.onChannelHeader
+		channel.onData = a.onChannelData
+		channel.onRelease = a.onChannelRelease
+
+		chunkOffsetStart := uint32(a.chunkIndex * kChunkSize)
+		chunkOffsetEnd := uint32((a.chunkIndex + 1) * kChunkSize)
+		err := a.player.stream.SendPacket(connection.PacketStreamChunk, buildAudioChunkRequest(channel.num, a.fileId, chunkOffsetStart, chunkOffsetEnd))
+	}
 }

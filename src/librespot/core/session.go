@@ -218,7 +218,8 @@ func (s *Session) handle(cmd uint8, data []byte) {
 		// Pong reply, ignore
 
 	case cmd == connection.PacketAesKey || cmd == connection.PacketAesKeyError ||
-		cmd == connection.PacketStreamChunkRes:
+		cmd == connection.PacketStreamChunkRes || cmd == connection.PacketChannelError ||
+			cmd == connection.PacketChannelAbort:
 		// Audio key and data responses
 		s.player.HandleCmd(cmd, data)
 

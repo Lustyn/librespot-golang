@@ -135,6 +135,21 @@ func (p *Player) HandleCmd(cmd byte, data []byte) {
 		} else {
 			fmt.Printf("Unknown channel!\n")
 		}
+	case cmd == connection.PacketChannelError, cmd == connection.PacketChannelAbort:
+		// Channel error response
+		var channel uint16
+		dataReader := bytes.NewReader(data)
+		binary.Read(dataReader, binary.BigEndian, &channel)
+
+		fmt.Printf("[player] Data on channel %d: %d bytes\n", channel, len(data[2:]))
+
+		p.chanLock.RLock()
+		if val, ok := p.channels[channel]; ok {
+			p.chanLock.RUnlock()
+			val.onRelease(val)
+		} else {
+			fmt.Printf("Unknown channel!\n")
+		}
 	}
 }
 
