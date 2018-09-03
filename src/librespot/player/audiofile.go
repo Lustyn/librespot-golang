@@ -348,5 +348,10 @@ func (a *AudioFile) onChannelData(channel *Channel, data []byte) uint16 {
 }
 func (a *AudioFile) onChannelAbort(channel *Channel) {
 	// aborted
+	select {
+	case a.responseChan <- []byte{}:
+		fmt.Println("Channel aborted")
+	default:
+	}
 	channel.onRelease(channel)
 }

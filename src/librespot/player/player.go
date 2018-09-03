@@ -138,10 +138,12 @@ func (p *Player) HandleCmd(cmd byte, data []byte) {
 	case cmd == connection.PacketChannelError, cmd == connection.PacketChannelAbort:
 		// Channel error response
 		var channel uint16
+		var error uint16
 		dataReader := bytes.NewReader(data)
 		binary.Read(dataReader, binary.BigEndian, &channel)
+		binary.Read(dataReader, binary.BigEndian, &error)
 
-		fmt.Printf("[player] Data on channel %d: %d bytes\n", channel, len(data[2:]))
+		fmt.Printf("[player] Error/abort on channel %d: %d\n", channel, error)
 
 		p.chanLock.RLock()
 		if val, ok := p.channels[channel]; ok {
