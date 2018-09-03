@@ -9,6 +9,7 @@ import (
 	"github.com/lustyn/librespot-golang/src/librespot/mercury"
 	"log"
 	"sync"
+	"time"
 )
 
 type Player struct {
@@ -144,6 +145,7 @@ func (p *Player) HandleCmd(cmd byte, data []byte) {
 		binary.Read(dataReader, binary.BigEndian, &error)
 
 		fmt.Printf("[player] Error/abort on channel %d: %d\n", channel, error)
+		time.Sleep(time.Second)
 
 		p.chanLock.RLock()
 		if val, ok := p.channels[channel]; ok {

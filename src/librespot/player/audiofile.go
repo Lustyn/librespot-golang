@@ -1,16 +1,17 @@
 package player
 
 import (
-	"github.com/lustyn/librespot-golang/src/Spotify"
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/binary"
 	"fmt"
-	"io"
+	"github.com/lustyn/librespot-golang/src/Spotify"
 	"github.com/lustyn/librespot-golang/src/librespot/connection"
+	"io"
 	"math"
 	"sync"
+	"time"
 )
 
 const kChunkSize = 32768 // In number of words (so actual byte size is kChunkSize*4, aka. kChunkByteSize)
@@ -64,6 +65,10 @@ func newAudioFileWithIdAndFormat(fileId []byte, format Spotify.AudioFile_Format,
 	}
 }
 
+func (a *AudioFile) GotSize() bool {
+	return a.gotSize
+}
+
 // Size returns the size, in bytes, of the final audio file
 func (a *AudioFile) Size() uint32 {
 	return a.size - uint32(a.headerOffset())
@@ -115,7 +120,7 @@ func (a *AudioFile) Read(buf []byte) (int, error) {
 
 	// The only error we can return here, is if we reach the end of the stream
 	var err error
-	if eof {
+	if eof && a.gotSize && uint32(a.cursor) >= a.size {
 		err = io.EOF
 	}
 
@@ -253,6 +258,9 @@ func (a *AudioFile) loadChunk(chunkIndex int) error {
 	// fmt.Printf("[AudioFile] Got encrypted chunk %d, len=%d...\n", i, len(wholeData))
 	if chunkSz > 0 {
 		a.putEncryptedChunk(chunkIndex, chunkData[0:chunkSz])
+	} else {
+		fmt.Println("Sleeping 1 second for ratelimit...")
+		time.Sleep(time.Second)
 	}
 
 	return nil
