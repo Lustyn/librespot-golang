@@ -201,10 +201,7 @@ func (a *AudioFile) loadChunks() {
 	go a.loadNextChunk()
 }
 
-var throttle = time.Tick(time.Second / 10)
-
 func (a *AudioFile) requestChunk(chunkIndex int) {
-	<-throttle
 	a.chunkLock.RLock()
 
 	// Check if we don't already have this chunk in the 2 next chunks requested
@@ -226,8 +223,10 @@ func (a *AudioFile) requestChunk(chunkIndex int) {
 	a.chunkLock.Unlock()
 }
 
+var throttle = time.Tick(time.Second/10)
 
 func (a *AudioFile) loadChunk(chunkIndex int) error {
+	<-throttle
 	chunkData := make([]byte, kChunkByteSize)
 
 	channel := a.player.AllocateChannel()
