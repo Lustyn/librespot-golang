@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"github.com/lustyn/librespot-golang/src/Spotify"
 	"github.com/lustyn/librespot-golang/src/librespot/connection"
-	"go.uber.org/ratelimit"
 	"io"
 	"math"
 	"sync"
+	"time"
 )
 
 const kChunkSize = 32768 // In number of words (so actual byte size is kChunkSize*4, aka. kChunkByteSize)
@@ -201,7 +201,10 @@ func (a *AudioFile) loadChunks() {
 	go a.loadNextChunk()
 }
 
+var throttle = time.Tick(time.Second / 10)
+
 func (a *AudioFile) requestChunk(chunkIndex int) {
+	<-throttle
 	a.chunkLock.RLock()
 
 	// Check if we don't already have this chunk in the 2 next chunks requested
@@ -223,10 +226,8 @@ func (a *AudioFile) requestChunk(chunkIndex int) {
 	a.chunkLock.Unlock()
 }
 
-var chunklimit = ratelimit.New(10)
 
 func (a *AudioFile) loadChunk(chunkIndex int) error {
-	chunklimit.Take()
 	chunkData := make([]byte, kChunkByteSize)
 
 	channel := a.player.AllocateChannel()
