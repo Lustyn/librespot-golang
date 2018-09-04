@@ -1,10 +1,10 @@
 package player
 
 import (
-	"github.com/lustyn/librespot-golang/src/Spotify"
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"github.com/lustyn/librespot-golang/src/Spotify"
 	"github.com/lustyn/librespot-golang/src/librespot/connection"
 	"github.com/lustyn/librespot-golang/src/librespot/mercury"
 	"log"

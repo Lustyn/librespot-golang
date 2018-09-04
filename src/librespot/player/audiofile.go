@@ -12,7 +12,6 @@ import (
 	"io"
 	"math"
 	"sync"
-	"time"
 )
 
 const kChunkSize = 32768 // In number of words (so actual byte size is kChunkSize*4, aka. kChunkByteSize)
@@ -262,9 +261,6 @@ func (a *AudioFile) loadChunk(chunkIndex int) error {
 	// fmt.Printf("[AudioFile] Got encrypted chunk %d, len=%d...\n", i, len(wholeData))
 	if chunkSz > 0 {
 		a.putEncryptedChunk(chunkIndex, chunkData[0:chunkSz])
-	} else {
-		fmt.Println("Sleeping 1 second for ratelimit...")
-		time.Sleep(time.Second)
 	}
 
 	return nil
