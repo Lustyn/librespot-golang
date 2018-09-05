@@ -18,8 +18,8 @@ type Player struct {
 	seq      uint32
 	audioKey []byte
 
-	seqLock  sync.RWMutex
-	chanLock sync.RWMutex
+	seqLock  *sync.RWMutex
+	chanLock *sync.RWMutex
 	channels map[uint16]*Channel
 	seqChans map[uint32]chan []byte
 	nextChan uint16
@@ -31,8 +31,8 @@ func CreatePlayer(conn connection.PacketStream, client *mercury.Client) *Player 
 		mercury:  client,
 		channels: map[uint16]*Channel{},
 		seqChans: map[uint32]chan []byte{},
-		chanLock: sync.RWMutex{},
-		seqLock:  sync.RWMutex{},
+		chanLock: &sync.RWMutex{},
+		seqLock:  &sync.RWMutex{},
 		nextChan: 0,
 	}
 }
